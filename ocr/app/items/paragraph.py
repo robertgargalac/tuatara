@@ -1,20 +1,17 @@
-from .base_item import BaseItem
+from base_item import BaseItem
 
 
 class Paragraph(BaseItem):
-    def __init__(self, text, x, y, w, h, lang, lines=None):
-        super().__init__(text, x, y, w, h)
+    def __init__(self, text, x1, y1, x2, y2, lang, text_lines=None):
+        super().__init__(text, x1, y1, x2, y2)
         self.text = ' '.join(text)
         self.lang = lang
-        self.lines = lines
+        self.text_lines = text_lines
 
-    def compute_coordinates(self, x,  y, w, h):
-        x1 = min(x)
-        y1 = min(y)
+    def compute_coordinates(self, x1,  y1, x2, y2):
+        x1 = min(x1)
+        y1 = min(y1)
 
-        total_height = max(h)
-        total_width = sum(w)
-
-        x2 = x1 + total_width
-        y2 = y1 + total_height
+        x2 = max(x2)
+        y2 = max(y2)
         return x1, y1, x2, y2
