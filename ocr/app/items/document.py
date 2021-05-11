@@ -1,7 +1,7 @@
-from base_item import BaseItem
-from paragraph import Paragraph
-from text_line import TextLine
-from utils import get_item
+from .base_item import BaseItem
+from .paragraph import Paragraph
+from .text_line import TextLine
+from .utils import get_item
 
 
 class Document:
