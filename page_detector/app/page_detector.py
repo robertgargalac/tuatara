@@ -19,7 +19,7 @@ class PageDetector:
 
         rescaled_contour = document_contour.reshape(1, 4, 2)[0] * ratio
         warped = self.four_point_transform(image, rescaled_contour)
-        warped_or = cv2.cvtColor(warped, cv2.COLOR_BGR2GRAY)
+        warped = cv2.cvtColor(warped, cv2.COLOR_BGR2GRAY)
 
         # Optional, use only if the document is noisy
         # t = threshold_local(warped_or, 11, offset=10, method="gaussian")
