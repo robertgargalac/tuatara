@@ -19,15 +19,14 @@ class Document:
         for p in paragraphs:
             p['lines'] = get_item(p, 'line_num')
 
+        present_langs = set()
         self.paragraph_objects = []
-
         for p in paragraphs:
             text_line_objects = []
             # Check paragraph's language
             text = ' '.join(p['text'])
             lang = self.lang_detector.get_language(text)
-            if lang != self.preferred_language:
-                continue
+            present_langs.add(lang)
 
             for line in p['lines']:
                 text_line = TextLine(
@@ -68,9 +67,12 @@ class Document:
             paragraph.text_lines = text_line_objects
             self.paragraph_objects.append(paragraph)
 
+        if self.preferred_language in present_langs:
+            self.filter_parapgrahs(self.preferred_language)
+
     def filter_parapgrahs(self, lang):
-        self.paragraphs = [
+        self.paragraph_objects = [
             paragraph
-            for paragraph in self.paragraphs
+            for paragraph in self.paragraph_objects
             if paragraph.lang == lang
         ]
