@@ -3,8 +3,8 @@ import requests
 from fastapi import FastAPI
 from pydantic import BaseModel
 from utils import b64_to_img
+from workflow import Workflow
 app = FastAPI()
-
 GATEWAY_API_URL = 'http://127.0.0.1:5003/user_response'
 
 class Image(BaseModel):
@@ -15,9 +15,10 @@ class Image(BaseModel):
 
 @app.post('/ocr', status_code=200)
 def get_page_position(data: Image):
-    document = b64_to_img(data.img)
+    processed_img = b64_to_img(data.img)
 
-    results = worflow.run(document, data.language)
+    worflow = Workflow(processed_img)
+    results = worflow.run(data.language)
 
     for batch in results:
         payload = {

@@ -35,8 +35,13 @@ class Workflow:
         doc.build_structure(tesseract_output)
 
         for p in doc.paragraph_objects:
-            audio_binarry = self.text_to_speech(p.text)
-            yield audio_binarry
+            audio_binary_lines = [
+                self.text_to_speech(text_line.text)
+                for text_line in p.text_lines
+                if text_line.text.strip() != ''
+            ]
+
+            yield audio_binary_lines
 
     @staticmethod
     def text_to_speech(text, lang='en'):
