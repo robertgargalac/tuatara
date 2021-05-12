@@ -3,7 +3,6 @@ FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7
 COPY ./app /app
 
 RUN apt install wget
-
 RUN wget -O /app/table_detection/model_files/ICDAR.19.Track.B2.Modern.table.structure.recognition.v2.pth --no-check-certificate 'https://drive.google.com/u/1/uc?id=1-QieHkR1Q7CXuBu4fp3rYrvDG9j26eFT&export=download'
 
 
@@ -16,3 +15,6 @@ pip install mmcv-full==1.0.5 -f https://download.openmmlab.com/mmcv/dist/cpu/tor
 
 COPY ./requirements.txt /requirements.txt
 RUN pip3 install --no-cache-dir -r /requirements.txt
+
+RUN python -m nltk.downloader stopwords
+RUN python -m nltk.downloader punkt
