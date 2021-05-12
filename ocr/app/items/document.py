@@ -5,10 +5,11 @@ from .utils import get_item
 
 
 class Document:
-    def __init__(self, w, h, preferred_language, multiple_lang_text=False):
+    def __init__(self, w, h, lang_detector, preferred_language, multiple_lang_text=False):
         self.w = w
         self.h = h
 
+        self.lang_detector = lang_detector
         self.preferred_language = preferred_language
         self.multiple_lang_text = multiple_lang_text
 
@@ -22,7 +23,11 @@ class Document:
 
         for p in paragraphs:
             text_line_objects = []
-            lang = 'en'
+            # Check paragraph's language
+            text = ' '.join(p['text'])
+            lang = self.lang_detector.get_language(text)
+            if lang != self.preferred_language:
+                continue
 
             for line in p['lines']:
                 text_line = TextLine(
