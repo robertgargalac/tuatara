@@ -13,5 +13,5 @@ def b64_to_img(base64_string):
 
 def img_to_b64(img):
     _, img_bin = cv2.imencode('.png', img)
-    b64 = b64encode(img_bin)
+    b64 = b64encode(img_bin).decode()
     return b64
