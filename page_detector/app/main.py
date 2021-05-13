@@ -1,5 +1,6 @@
 import multiprocessing
 import requests
+import json
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.encoders import jsonable_encoder
@@ -7,7 +8,7 @@ from fastapi.encoders import jsonable_encoder
 from page_detector import PageDetector
 from utils import b64_to_img, img_to_b64
 
-OCR_SERVICE_URL = 'http://127.0.0.1:5002/ocr'
+OCR_SERVICE_URL = 'http://ocr:80/ocr'
 app = FastAPI()
 page_detector = PageDetector()
 
@@ -24,10 +25,9 @@ def get_page_position(data: Image):
     decoded_img = b64_to_img(encoded_img)
 
     processed_img, img_adjustments = page_detector.process(decoded_img)
-
-    if processed_img:
+    print(processed_img.shape)
+    if processed_img.size > 0:
         processed_img_b64 = img_to_b64(processed_img)
-
         # Call ocr service
         payload = {
             'distinct_id': data.distinct_id,
@@ -36,7 +36,7 @@ def get_page_position(data: Image):
         }
 
         process = multiprocessing.Pool(processes=1)
-        process.apply_async(requests.post, [OCR_SERVICE_URL, payload])
+        process.apply_async(requests.post, [OCR_SERVICE_URL, json.dumps(payload)])
 
     return jsonable_encoder(img_adjustments)
 

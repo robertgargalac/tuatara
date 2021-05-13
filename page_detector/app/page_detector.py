@@ -9,17 +9,16 @@ class PageDetector:
         ratio = image.shape[0] / scale_factor
 
         resized_image = imutils.resize(image, height=scale_factor)
-        self.h_res_image, self.w_res_image, _ = resized_image.shape
+        self.h_res_image, self.w_res_image = resized_image.shape
 
         document_contour = self.__find_document(resized_image)
         camera_adjustments = self.check_document_position(document_contour)
 
         if True in camera_adjustments.values():
-            return None, camera_adjustments
+            return np.array([]), camera_adjustments
 
         rescaled_contour = document_contour.reshape(1, 4, 2)[0] * ratio
         warped = self.four_point_transform(image, rescaled_contour)
-        warped = cv2.cvtColor(warped, cv2.COLOR_BGR2GRAY)
 
         # Optional, use only if the document is noisy
         # t = threshold_local(warped_or, 11, offset=10, method="gaussian")
@@ -79,9 +78,8 @@ class PageDetector:
 
     @staticmethod
     def __get_contours(image):
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        gray = cv2.GaussianBlur(gray, (5, 5), 0)
-        edged = cv2.Canny(gray, 75, 200)
+        filtered_img = cv2.GaussianBlur(image, (5, 5), 0)
+        edged = cv2.Canny(filtered_img, 75, 200)
 
         contours = cv2.findContours(edged.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
         contours = imutils.grab_contours(contours)

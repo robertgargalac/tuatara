@@ -1,0 +1,18 @@
+version: '3.4'
+services:
+
+  page_detector:
+    build:
+      context: .
+      dockerfile: ./page_detector/Dockerfile
+    image: pdimg
+    ports:
+      - "5001:80"
+
+  ocr:
+    build:
+      context: .
+      dockerfile: ./ocr/Dockerfile
+    image: ocrimg
+    ports:
+      - "5002:80"
