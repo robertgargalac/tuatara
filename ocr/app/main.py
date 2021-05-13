@@ -30,7 +30,7 @@ def process_document(data: Image):
         with open(str(count) + 'audio.json', 'w') as f:
             json.dump(payload, f)
 
-        # process = multiprocessing.Pool(processes=1)
-        # process.apply_async(requests.post, [GATEWAY_API_URL, json.dumps(payload)])
+        process = multiprocessing.Pool(processes=1)
+        process.apply_async(requests.post, [GATEWAY_API_URL, json.dumps(payload)])
 
         count += 1
