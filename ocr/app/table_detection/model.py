@@ -1,4 +1,5 @@
 import os
+import numpy as np
 from mmdet.apis import init_detector, inference_detector
 from .utils import show_result
 
@@ -14,9 +15,13 @@ class Model:
     def build_model(self):
         self.model = init_detector(self.config_file, self.checkpoint_file, device='cpu')
 
-    def predict(self, image_path):
-        result = inference_detector(self.model, image_path)
-        table_coords = show_result(image_path, result,
+    def predict(self, image):
+        """
+        :param image: a numpy array or image path, image needs to have the following shape: (height, width, 3)
+        :return:
+        """
+        result = inference_detector(self.model, image)
+        table_coords = show_result(image, result,
                                    ('Bordered', 'cell', 'Borderless'),
                                    score_thr=0.85, out_file='predicted.png')
         return table_coords

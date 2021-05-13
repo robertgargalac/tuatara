@@ -3,16 +3,14 @@ from pytesseract import Output
 import cv2
 from gtts import gTTS
 import base64
-import os
 import re
 import datefinder
-from collections import defaultdict
 
 from language_detector import LanguageDetector
 from table_detection.model import Model
 from items.document import Document
 from items.utils import month_decode_dict
-
+files_count = 0
 
 class Workflow:
     def __init__(self, image):
@@ -45,14 +43,14 @@ class Workflow:
 
     @staticmethod
     def text_to_speech(text, lang='en'):
-        myobj = gTTS(text=text, lang=lang, slow=False)
-        myobj.save('temp_file.mp3')
+        global files_count
+        tts = gTTS(text=text, lang=lang)
+        tts.save(f'speech{files_count}.mp3')
 
-        f = open('temp_file.mp3', 'rb')
+        f = open(f'speech{files_count}.mp3', 'rb')
         enc = base64.b64encode(f.read())
         base64_message = enc.decode('ascii')
-
-        os.remove('temp_file.mp3')
+        files_count += 1
         return base64_message
 
     def date_processing(self, tesseract_output, language):
