@@ -5,6 +5,7 @@ from gtts import gTTS
 import base64
 import re
 import datefinder
+import numpy as np
 
 from language_detector import LanguageDetector
 from table_detection.model import Model
@@ -12,18 +13,23 @@ from items.document import Document
 from items.utils import month_decode_dict
 files_count = 0
 
+
 class Workflow:
     def __init__(self, image):
         """
         :param image: a gray image
         """
         self.image = image
+        self.model = Model()
 
     def run(self, language='english'):
         """
         :param language: 'english', 'romanian'
         :return:
         """
+        self.model.build_model()
+        model_image = np.stack((self.image,) * 3, axis=-1)
+        table_coords = self.model.predict(model_image)
         tesseract_output = pytesseract.image_to_data(self.image, output_type=Output.DICT, lang='ron')
 
         self.date_processing(tesseract_output, language)
@@ -34,7 +40,7 @@ class Workflow:
 
         for p in doc.paragraph_objects:
             audio_binary_lines = [
-                self.text_to_speech(text_line.text)
+                self.text_to_speech(text_line.text, language)
                 for text_line in p.text_lines
                 if text_line.text.strip() != ''
             ]
@@ -44,6 +50,10 @@ class Workflow:
     @staticmethod
     def text_to_speech(text, lang='en'):
         global files_count
+        if lang == 'romanian':
+            lang = 'ro'
+        else:
+            lang = 'en'
         tts = gTTS(text=text, lang=lang)
         tts.save(f'speech{files_count}.mp3')
 
@@ -98,3 +108,14 @@ class Workflow:
                 else:
                     max_dates[index] = int_date
         return date_split
+
+    @staticmethod
+    def check_in_table(tables_coords, text_coords):
+        table_threshold = [10, 10, 10, 10]
+        for table_coords in tables_coords:
+            if table_coords[0] + table_threshold[0] < text_coords[0] and \
+                    table_coords[1] + table_threshold[0] < text_coords[1] and \
+                    table_coords[2] + table_threshold[0] > text_coords[2] and \
+                    table_coords[3] + table_threshold[0] > text_coords[3]:
+                return True
+            return False
